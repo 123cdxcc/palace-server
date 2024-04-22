@@ -15,10 +15,10 @@ type UserConnect struct {
 	core   *Core
 }
 
-func NewUserConnect(userID uint32, conn *websocket.Conn, core *Core) *UserConnect {
+func NewUserConnect(userID, roomID uint32, conn *websocket.Conn, core *Core) *UserConnect {
 	uc := &UserConnect{
 		userID: userID,
-		roomID: 0,
+		roomID: roomID,
 		sc:     make(chan types.Body),
 		conn:   conn,
 		core:   core,
@@ -43,6 +43,16 @@ func (u *UserConnect) doReader() {
 		case types.TypeJoinRoom:
 			u.roomID = body.RoomID
 		case types.TypeMessage:
+			user, err := getUserByID(u.userID)
+			if err != nil {
+				log.Errorf("get user with id err: %v", err)
+				continue
+			}
+			body.SendUser = &types.User{
+				ID:   user.ID,
+				Name: user.Name,
+			}
+			body.RoomID = u.roomID
 			u.core.message <- *body
 		default:
 			log.Infof("unknown type: %v", body.Type)

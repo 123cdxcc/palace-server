@@ -43,7 +43,7 @@ func (c *Core) Run() {
 					}
 				}
 				if body.SendUser.ID == connect.userID { // 如果发送者和接收的用户相同就跳过
-					continue
+					//continue
 				}
 				if connect.roomID != body.RoomID { // 不属于同一个房间的跳过
 					continue

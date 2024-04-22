@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"palace-server/pkg/constant"
+	"palace-server/pkg/resp"
 	"palace-server/pkg/utils"
 )
 
@@ -16,22 +16,20 @@ func VerifyAuth(authWhiteList []string) gin.HandlerFunc {
 				return
 			}
 		}
-		token := ctx.GetHeader("Authorization")
+		token := ctx.Request.URL.Query().Get("Authorization")
+		hToken := ctx.GetHeader("Authorization")
+		if hToken != "" {
+			token = hToken
+		}
 		if token == "" {
 			ctx.Abort()
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code":    http.StatusUnauthorized,
-				"message": "No Authorized",
-			})
+			resp.UnauthorizedError(ctx)
 			return
 		}
 		claims, err := utils.VerifyToken(token)
 		if err != nil || claims == nil {
 			ctx.Abort()
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code":    http.StatusUnauthorized,
-				"message": "No Authorized",
-			})
+			resp.UnauthorizedError(ctx)
 			return
 		}
 		ctx.Set(constant.UserIdKey, claims.ID)
