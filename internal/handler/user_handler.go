@@ -3,9 +3,9 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
-	"net/http"
 	"palace-server/internal/logic"
 	"palace-server/internal/model"
+	"palace-server/pkg/log"
 	"palace-server/pkg/resp"
 	"palace-server/pkg/utils"
 )
@@ -43,13 +43,25 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 		resp.InternalServerError(ctx)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"code":  http.StatusOK,
+	resp.Ok(ctx, gin.H{
+		"uid":   uid,
 		"token": token,
 	})
+	log.Infof("%v register", uid)
 	return
 }
 
 func (h *UserHandler) Logout(ctx *gin.Context) {
-
+	userID, err := utils.GetUserID(ctx)
+	if err != nil {
+		resp.UnauthorizedError(ctx)
+		return
+	}
+	err = h.userLogic.Logout(ctx, userID)
+	if err != nil {
+		resp.UnauthorizedError(ctx)
+		return
+	}
+	resp.Ok(ctx)
+	log.Infof("%v logout", userID)
 }

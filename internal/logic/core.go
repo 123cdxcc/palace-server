@@ -2,6 +2,8 @@ package logic
 
 import (
 	"context"
+	"fmt"
+	"palace-server/pkg/log"
 	"palace-server/types"
 )
 
@@ -51,11 +53,20 @@ func (c *Core) Run() {
 				connect.sc <- body
 			}
 		case uc := <-c.add: // 新连接
+			user, err := getUserByID(uc.userID)
+			if err != nil {
+				log.Errorf("%v", err)
+				continue
+			}
 			c.userConnects[uc] = struct{}{}
 			body := types.Body{
-				Type:     types.TypeMessage,
-				SendUser: nil,
-				RoomID:   uc.roomID,
+				Type: types.TypeMessage,
+				SendUser: &types.User{
+					ID:   0,
+					Name: "系统",
+				},
+				RoomID: uc.roomID,
+				Data:   fmt.Sprintf("hello %s", user.Name),
 			}
 			uc.sc <- body
 		case uc := <-c.remove: // 退出连接

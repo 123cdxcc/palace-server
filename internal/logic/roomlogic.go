@@ -43,7 +43,6 @@ func (l *RoomLogic) JoinRoom(ctx context.Context, userID, roomID uint32) error {
 		}
 	}
 	room.Players = append(room.Players, user)
-	_rooms = append(_rooms, room)
 	return nil
 }
 
@@ -72,4 +71,12 @@ func (l *RoomLogic) ExitRoom(ctx context.Context, roomID, userID uint32) error {
 
 func (l *RoomLogic) GetRoom(ctx context.Context, roomID uint32) (*model.Room, error) {
 	return getRoomByID(roomID)
+}
+
+func (h *RoomLogic) ListRoomUser(ctx context.Context, roomID uint32) ([]*model.User, error) {
+	room, err := getRoomByID(roomID)
+	if err != nil {
+		return nil, err
+	}
+	return room.Players, nil
 }

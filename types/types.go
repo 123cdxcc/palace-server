@@ -15,6 +15,6 @@ type Body struct {
 }
 
 type User struct {
-	ID   uint32
-	Name string
+	ID   uint32 `json:"id"`
+	Name string `json:"name"`
 }

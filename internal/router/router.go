@@ -31,7 +31,8 @@ func initializeUserRouter(userHandler *handler.UserHandler) {
 func initializeRoomRouter(roomHandler *handler.RoomHandler) {
 	r := router.Group("room")
 	r.POST("create", roomHandler.CreateRoom)
-	r.POST("list", roomHandler.ListRoom)
+	r.GET("list", roomHandler.ListRoom)
+	r.GET("list-user", roomHandler.ListRoomUser)
 }
 
 func initializeConnectRouter(connectHandler *handler.ConnectHandler) {

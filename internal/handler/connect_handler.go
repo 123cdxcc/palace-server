@@ -64,6 +64,10 @@ func (h *ConnectHandler) Connect(ctx *gin.Context) {
 		return
 	}
 	uc := logic.NewUserConnect(userID, uint32(roomID), conn, h.core)
+	log.Infof("user %v connect", userID)
 	h.core.Dispose(ctx, uc)
-	defer h.core.Quit(ctx, uc)
+	defer func() {
+		h.core.Quit(ctx, uc)
+		log.Infof("user %v disconnect", userID)
+	}()
 }
